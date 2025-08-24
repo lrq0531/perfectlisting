@@ -9,15 +9,20 @@ read -p "Deploy to (vercel/fly): " PLATFORM
 if [ "$PLATFORM" = "vercel" ]; then
     echo "Deploying to Vercel..."
     npx vercel login
-    # Upload env vars
+
+    # Upload env vars (sync all to production)
     while IFS= read -r line; do
       if [[ -z "$line" ]] || [[ "$line" == \#* ]]; then continue; fi
       key=$(echo "$line" | cut -d'=' -f1)
       value=$(echo "$line" | cut -d'=' -f2-)
       echo "Setting Vercel env: $key"
-      npx vercel env add $key <<< "$value" || true
+      echo "$value" | npx vercel env add "$key" production  || true
+      echo "$value" | npx vercel env add "$key" preview  || true
+      echo "$value" | npx vercel env add "$key" development  || true
     done < .env.local
+
     npx vercel --prod
+
 elif [ "$PLATFORM" = "fly" ]; then
     echo "Deploying to Fly.io..."
     flyctl auth login
