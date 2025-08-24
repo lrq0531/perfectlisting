@@ -1,0 +1,35 @@
+{
+	"name": "ai-listing-tool",
+	"version": "0.2.0",
+	"private": true,
+	"scripts": {
+		"dev": "next dev",
+		"build": "next build",
+		"start": "next start",
+		"lint": "next lint",
+		"prettier:format": "npx prettier --write .",
+		"prettier:check": "npx prettier --check ."
+	},
+	"dependencies": {
+		"@supabase/auth-helpers-nextjs": "^0.10.0",
+		"@supabase/auth-helpers-react": "^0.5.0",
+		"autoprefixer": "^10.4.21",
+		"multer": "^1.4.5-lts.1",
+		"next": "13.4.13",
+		"next-connect": "^0.12.2",
+		"openai": "5.1.0",
+		"postcss": "^8.5.6",
+		"react": "18.3.0",
+		"react-dom": "18.3.0",
+		"stripe": "14.21.0",
+		"tailwindcss": "^3.3.3"
+	},
+	"devDependencies": {
+		"@types/node": "18.16.0",
+		"@types/react": "18.2.7",
+		"@types/react-dom": "18.2.4",
+		"eslint": "8.40.0",
+		"eslint-config-next": "13.4.13",
+		"prettier": "^2.8.8"
+	}
+}
