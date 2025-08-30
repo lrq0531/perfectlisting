@@ -2,13 +2,13 @@
 
 This repo is a production-ready starter for an AI Listing Optimizer SaaS:
 
-- Next.js + Tailwind
-- Supabase Auth + Storage + Postgres (listings history)
-- OpenAI (text + vision) integration with mock-mode fallback
-- Image upload endpoint (uploads to Supabase Storage)
-- Stripe checkout scaffold
-- Deploy scripts for Vercel and Fly.io
-- Zero-setup local mock mode enabled by default
+-   Next.js + Tailwind
+-   Supabase Auth + Storage + Postgres (listings history)
+-   OpenAI (text + vision) integration with mock-mode fallback
+-   Image upload endpoint (uploads to Supabase Storage)
+-   Stripe checkout scaffold
+-   Deploy scripts for Vercel and Fly.io
+-   Zero-setup local mock mode enabled by default
 
 ## Quick start (local, zero-setup)
 
