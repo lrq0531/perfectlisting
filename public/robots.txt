@@ -1,4 +1,9 @@
+# *
 User-agent: *
 Allow: /
 
+# Host
+Host: https://perfectlisting.vercel.app/
+
+# Sitemaps
 Sitemap: https://perfectlisting.vercel.app/sitemap.xml
