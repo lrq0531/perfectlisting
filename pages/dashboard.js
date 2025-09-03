@@ -9,6 +9,25 @@ export default function Dashboard() {
 	const [result, setResult] = useState(null);
 	const [loading, setLoading] = useState(false);
 	const [history, setHistory] = useState([]);
+	const [user, setUser] = useState(null);
+
+	useEffect(() => {
+		const fetchUser = async () => {
+			const {
+				data: { user }
+			} = await supabase.auth.getUser();
+			if (user) {
+				// Fetch from users table
+				const { data, error } = await supabase.from('profiles').select('is_paid').eq('id', user.id).single();
+
+				if (!error) {
+					setUser({ ...user, ...data });
+				}
+			}
+			setLoading(false);
+		};
+		fetchUser();
+	}, []);
 
 	useEffect(() => {
 		if (!session) return;
@@ -48,10 +67,23 @@ export default function Dashboard() {
 		);
 	}
 
+	if (loading) return <p>Loading...</p>;
+
 	return (
 		<div className="min-h-screen p-6">
 			<div className="max-w-4xl mx-auto">
 				<h1 className="text-2xl font-bold mb-4">AI Listing Optimizer — Dashboard</h1>
+				{!user?.is_paid && (
+					<div className="mt-4 p-4 bg-yellow-100 text-yellow-800 rounded">
+						🚀 Upgrade to Pro to unlock full features!
+					</div>
+				)}
+
+				{user?.is_paid && (
+					<div className="mt-4 p-4 bg-green-100 text-green-800 rounded">
+						✅ You are a Pro user. Thanks for supporting PerfectListing!
+					</div>
+				)}
 				<div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 					<ListingForm onGenerate={handleGenerate} loading={loading} />
 					<div>

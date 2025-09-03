@@ -7,7 +7,19 @@ export default function Auth() {
 
 	async function handleMagicLink(e) {
 		e.preventDefault();
-		const { error } = await supabase.auth.signInWithOtp({ email });
+		const {
+			data: { user },
+			error
+		} = await supabase.auth.signInWithOtp({ email });
+		// const { data: { user }, error } = await supabase.auth.signUp({
+		// 	email,
+		// 	password,
+		//   });
+
+		if (user) {
+			console.log('User signed up:', user);
+			await supabase.from('profiles').insert([{ id: user.id, email: user.email }]);
+		}
 		if (error) alert(error.message);
 		else alert('Check your email for the magic link.');
 	}

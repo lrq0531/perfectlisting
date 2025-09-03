@@ -22,6 +22,16 @@ export default function ListingForm({ onGenerate, loading }) {
 		onGenerate({ product, description, platform, imageUrl });
 	}
 
+	async function handleCheckout() {
+		const res = await fetch('/api/checkout', { method: 'POST' });
+		const data = await res.json();
+		if (data.url) {
+			window.location.href = data.url; // Redirect to Stripe Checkout
+		} else {
+			alert('Checkout failed');
+		}
+	}
+
 	return (
 		<form onSubmit={submit} className="p-4 bg-white border rounded">
 			<label className="block mb-2">
@@ -75,6 +85,9 @@ export default function ListingForm({ onGenerate, loading }) {
 					}}
 				>
 					Clear
+				</button>
+				<button onClick={handleCheckout} className="bg-blue-600 text-white px-4 py-2 rounded">
+					Upgrade to Pro
 				</button>
 			</div>
 		</form>
