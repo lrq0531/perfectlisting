@@ -1,5 +1,5 @@
 import Stripe from 'stripe';
-import { buffer } from 'micro';
+import getRawBody from 'raw-body';
 
 export const config = {
 	api: {
@@ -19,7 +19,7 @@ const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
 export default async function handler(req, res) {
 	if (req.method !== 'POST') return res.status(405).end();
 
-	const buf = await buffer(req);
+	const buf = await getRawBody(req);
 	const sig = req.headers['stripe-signature'];
 
 	let event;
