@@ -1,5 +1,9 @@
 import Stripe from 'stripe';
+import { createClient } from '@supabase/supabase-js';
+
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
+
+const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
 
 export default async function handler(req, res) {
 	if (req.method !== 'POST') return res.status(405).end();
@@ -7,6 +11,15 @@ export default async function handler(req, res) {
 		if (process.env.MOCK_MODE === 'true') {
 			return res.status(200).json({ url: '/mock-checkout' });
 		}
+
+		const { supabaseAccessToken } = req.body;
+		const {
+			data: { user },
+			error
+		} = await supabase.auth.getUser(supabaseAccessToken);
+
+		if (error || !user) return res.status(401).json({ error: 'User not authenticated' });
+
 		const session = await stripe.checkout.sessions.create({
 			payment_method_types: ['card'],
 			mode: 'payment', // changed from 'subscription' to 'payment'
