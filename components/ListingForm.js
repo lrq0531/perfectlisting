@@ -1,4 +1,7 @@
 import { useState } from 'react';
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
 
 export default function ListingForm({ onGenerate, loading }) {
 	const [product, setProduct] = useState('');
@@ -23,7 +26,14 @@ export default function ListingForm({ onGenerate, loading }) {
 	}
 
 	async function handleCheckout() {
-		const res = await fetch('/api/checkout', { method: 'POST' });
+		const session = supabase.auth.session(); // get current session
+		if (!session) return alert('Please login first');
+
+		const res = await fetch('/api/checkout', {
+			method: 'POST',
+			headers: { 'Content-Type': 'application/json' },
+			body: JSON.stringify({ supabaseAccessToken: session.access_token })
+		});
 		const data = await res.json();
 		if (data.url) {
 			window.location.href = data.url; // Redirect to Stripe Checkout
