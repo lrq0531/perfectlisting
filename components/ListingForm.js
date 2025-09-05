@@ -1,105 +1,108 @@
 import { useState } from 'react';
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL, process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY);
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+);
 
 export default function ListingForm({ onGenerate, loading }) {
-	const [product, setProduct] = useState('');
-	const [description, setDescription] = useState('');
-	const [platform, setPlatform] = useState('Etsy');
-	const [file, setFile] = useState(null);
-	const [uploading, setUploading] = useState(false);
+  const [product, setProduct] = useState('');
+  const [description, setDescription] = useState('');
+  const [platform, setPlatform] = useState('Etsy');
+  const [file, setFile] = useState(null);
+  const [uploading, setUploading] = useState(false);
 
-	async function submit(e) {
-		e.preventDefault();
-		let imageUrl = null;
-		if (file) {
-			setUploading(true);
-			const fd = new FormData();
-			fd.append('file', file);
-			const r = await fetch('/api/upload', { method: 'POST', body: fd });
-			const j = await r.json();
-			imageUrl = j.url;
-			setUploading(false);
-		}
-		onGenerate({ product, description, platform, imageUrl });
-	}
+  async function submit(e) {
+    e.preventDefault();
+    let imageUrl = null;
+    if (file) {
+      setUploading(true);
+      const fd = new FormData();
+      fd.append('file', file);
+      const r = await fetch('/api/upload', { method: 'POST', body: fd });
+      const j = await r.json();
+      imageUrl = j.url;
+      setUploading(false);
+    }
+    onGenerate({ product, description, platform, imageUrl });
+  }
 
-	async function handleCheckout() {
-		const session = supabase.auth.session(); // get current session
-		if (!session) return alert('Please login first');
+  async function handleCheckout() {
+    const session = supabase.auth.getSession(); // get current session
+    if (!session) return alert('Please login first');
 
-		const res = await fetch('/api/checkout', {
-			method: 'POST',
-			headers: { 'Content-Type': 'application/json' },
-			body: JSON.stringify({ supabaseAccessToken: session.access_token })
-		});
-		const data = await res.json();
-		if (data.url) {
-			window.location.href = data.url; // Redirect to Stripe Checkout
-		} else {
-			alert('Checkout failed');
-		}
-	}
+    const res = await fetch('/api/checkout', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ supabaseAccessToken: session.access_token }),
+    });
+    const data = await res.json();
+    if (data.url) {
+      window.location.href = data.url; // Redirect to Stripe Checkout
+    } else {
+      alert('Checkout failed');
+    }
+  }
 
-	return (
-		<form onSubmit={submit} className="p-4 bg-white border rounded">
-			<label className="block mb-2">
-				<div className="text-sm font-medium">Product name</div>
-				<input
-					value={product}
-					onChange={e => setProduct(e.target.value)}
-					className="mt-1 w-full border rounded px-2 py-1"
-					placeholder="Handmade ceramic mug"
-				/>
-			</label>
-			<label className="block mb-2">
-				<div className="text-sm font-medium">Short description</div>
-				<textarea
-					value={description}
-					onChange={e => setDescription(e.target.value)}
-					className="mt-1 w-full border rounded px-2 py-1"
-					placeholder="Large 400ml mug with rustic glaze..."
-				/>
-			</label>
-			<label className="block mb-2">
-				<div className="text-sm font-medium">Photo (optional)</div>
-				<input type="file" onChange={e => setFile(e.target.files[0])} />
-			</label>
-			<label className="block mb-4">
-				<div className="text-sm font-medium">Platform</div>
-				<select
-					value={platform}
-					onChange={e => setPlatform(e.target.value)}
-					className="mt-1 w-full border rounded px-2 py-1"
-				>
-					<option>Etsy</option>
-					<option>Shopify</option>
-					<option>Amazon</option>
-				</select>
-			</label>
-			<div className="flex gap-2">
-				<button
-					type="submit"
-					className="px-4 py-2 bg-blue-600 text-white rounded"
-					disabled={loading || uploading}
-				>
-					Generate Listing
-				</button>
-				<button
-					type="button"
-					className="px-4 py-2 border rounded"
-					onClick={() => {
-						setProduct('');
-						setDescription('');
-					}}
-				>
-					Clear
-				</button>
-				<button onClick={handleCheckout} className="bg-blue-600 text-white px-4 py-2 rounded">
-					Upgrade to Pro
-				</button>
-			</div>
-		</form>
-	);
+  return (
+    <form onSubmit={submit} className="p-4 bg-white border rounded">
+      <label className="block mb-2">
+        <div className="text-sm font-medium">Product name</div>
+        <input
+          value={product}
+          onChange={(e) => setProduct(e.target.value)}
+          className="mt-1 w-full border rounded px-2 py-1"
+          placeholder="Handmade ceramic mug"
+        />
+      </label>
+      <label className="block mb-2">
+        <div className="text-sm font-medium">Short description</div>
+        <textarea
+          value={description}
+          onChange={(e) => setDescription(e.target.value)}
+          className="mt-1 w-full border rounded px-2 py-1"
+          placeholder="Large 400ml mug with rustic glaze..."
+        />
+      </label>
+      <label className="block mb-2">
+        <div className="text-sm font-medium">Photo (optional)</div>
+        <input type="file" onChange={(e) => setFile(e.target.files[0])} />
+      </label>
+      <label className="block mb-4">
+        <div className="text-sm font-medium">Platform</div>
+        <select
+          value={platform}
+          onChange={(e) => setPlatform(e.target.value)}
+          className="mt-1 w-full border rounded px-2 py-1"
+        >
+          <option>Etsy</option>
+          <option>Shopify</option>
+          <option>Amazon</option>
+        </select>
+      </label>
+      <div className="flex gap-2">
+        <button
+          type="submit"
+          className="px-4 py-2 bg-blue-600 text-white rounded"
+          disabled={loading || uploading}
+        >
+          Generate Listing
+        </button>
+        <button
+          type="button"
+          className="px-4 py-2 border rounded"
+          onClick={() => {
+            setProduct('');
+            setDescription('');
+          }}
+        >
+          Clear
+        </button>
+        <button onClick={handleCheckout} className="bg-blue-600 text-white px-4 py-2 rounded">
+          Upgrade to Pro
+        </button>
+      </div>
+    </form>
+  );
 }
