@@ -28,7 +28,7 @@ export default function Dashboard() {
         if (!error) {
           setUser({ ...user, ...data });
         } else {
-          setUser(user);
+          setUser({ ...user, is_paid: false }); // default to false if error
         }
       }
       setLoading(false);
