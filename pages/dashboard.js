@@ -3,13 +3,27 @@ import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
 import ListingForm from '../components/ListingForm';
 import OutputCard from '../components/OutputCard';
 
-export default function Dashboard() {
+export default function Dashboard({ success }) {
   const session = useSession();
   const supabase = useSupabaseClient();
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [history, setHistory] = useState([]);
   const [user, setUser] = useState(null);
+
+  useEffect(async () => {
+    if (success == 1) {
+      alert('Payment successful! You are now a Pro user.');
+      setLoading(true);
+      const res = await fetch('/api/stripeWebhook', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const data = await res.json();
+      setResult(data);
+      setLoading(false);
+    }
+  }, [success]);
 
   useEffect(() => {
     const fetchUser = async () => {
