@@ -1,6 +1,6 @@
 import Stripe from 'stripe';
 import getRawBody from 'raw-body';
-import { createPagesServerClient } from '@supabase/auth-helpers-nextjs';
+import { supabaseAdmin } from '../../lib/supabaseAdmin';
 
 export const config = {
   api: {
@@ -18,7 +18,7 @@ export default async function handler(req, res) {
   const buf = await getRawBody(req);
   const sig = req.headers['stripe-signature'];
 
-  const supabase = createPagesServerClient({ req, res });
+  //   const supabase = createPagesServerClient({ req, res });
 
   let event;
 
@@ -32,7 +32,7 @@ export default async function handler(req, res) {
   // Handle checkout completion
   if (event.type === 'checkout.session.completed') {
     const session = event.data.object;
-    const customerEmail = session.customer_email;
+    const customerEmail = session.customer_details.email;
     // Use client_reference_id or metadata to know which user paid
     const userId = session.client_reference_id;
 
@@ -40,7 +40,10 @@ export default async function handler(req, res) {
     console.log('Payment successful for:', userId);
 
     // Example: mark user as paid in Supabase
-    const { error } = await supabase.from('profiles').update({ is_paid: true }).eq('id', userId);
+    const { error } = await supabaseAdmin
+      .from('profiles')
+      .update({ is_paid: true })
+      .eq('id', userId);
 
     if (error) {
       console.error('Supabase update error:', error);
