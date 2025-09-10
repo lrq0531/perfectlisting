@@ -40,6 +40,7 @@ export default async function handler(req, res) {
     console.log('Payment successful for:', userId);
 
     // Example: mark user as paid in Supabase
+    // Use admin client to update the user's profile, since the profiles table is protected.
     const { error } = await supabaseAdmin
       .from('profiles')
       .update({ is_paid: true })

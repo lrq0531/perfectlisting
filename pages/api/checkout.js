@@ -1,6 +1,5 @@
 import Stripe from 'stripe';
 import { createPagesServerClient } from '@supabase/auth-helpers-nextjs';
-import { supabaseClient } from '../../lib/supabaseClient';
 
 const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
 
@@ -11,11 +10,12 @@ export default async function handler(req, res) {
       return res.status(200).json({ url: '/mock-checkout' });
     }
 
+    // Reads the auth cookie from the incoming request (supplied by the browser) to create supabase client.
     const supabase = createPagesServerClient({ req, res });
     const {
       data: { user },
       error,
-    } = await supabaseClient.auth.getUser();
+    } = await supabase.auth.getUser();
 
     if (error || !user) return res.status(200).json({ error: error });
 
