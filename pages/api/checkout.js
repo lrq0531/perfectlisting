@@ -24,10 +24,10 @@ export default async function handler(req, res) {
       mode: 'payment', // changed from 'subscription' to 'payment'
       line_items: [{ price: process.env.STRIPE_PRICE_ID, quantity: 1 }],
       success_url: `${
-        process.env.NEXT_PUBLIC_BASE_URL_N || 'http://localhost:3000'
+        process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
       }/dashboard?success=1`,
       cancel_url: `${
-        process.env.NEXT_PUBLIC_BASE_URL_N || 'http://localhost:3000'
+        process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'
       }/dashboard?canceled=1`,
       client_reference_id: user.id, // <- Supabase user id
     });
