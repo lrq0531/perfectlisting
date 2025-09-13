@@ -63,10 +63,10 @@ export default function Home() {
             </div>
           ) : (
             <div className="flex gap-4">
-              <Link href="/auth" className="text-white bg-blue-500 px-4 py-2 rounded">
+              <Link href="/signUp" className="text-white bg-blue-500 px-4 py-2 rounded">
                 Try Free
               </Link>
-              <Link href="/auth/login" className="text-gray-700 bg-gray-200 px-4 py-2 rounded">
+              <Link href="/login" className="text-gray-700 bg-gray-200 px-4 py-2 rounded">
                 Login
               </Link>
             </div>
