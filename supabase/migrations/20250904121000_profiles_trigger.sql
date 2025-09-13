@@ -1,17 +1,18 @@
--- Function: create a profile entry whenever a new auth.user is created
+-- 1. Create function
 create or replace function public.handle_new_user()
 returns trigger as $$
 begin
-  insert into public.profiles (id, email)
-  values (new.id, new.email)
-  on conflict (id) do nothing;
+  if not exists (select 1 from public.profiles where email = new.email) then
+    insert into public.profiles (id, email, created_at, is_paid)
+    values (new.id, new.email, now(), false);
+  end if;
   return new;
 end;
-$$ language plpgsql security definer;
+$$ language plpgsql
+security definer;
 
--- Trigger: run handle_new_user after new auth.users row
-drop trigger if exists on_auth_user_created on auth.users;
-
+-- 2. Attach trigger to auth.users table
 create trigger on_auth_user_created
 after insert on auth.users
-for each row execute procedure public.handle_new_user();
+for each row
+execute function public.handle_new_user();
