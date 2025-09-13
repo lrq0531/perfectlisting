@@ -1,21 +1,52 @@
 import Link from 'next/link';
 import { NextSeo } from 'next-seo';
+import { useState, useEffect } from 'react';
+import { useSupabaseClient } from '@supabase/auth-helpers-react';
 
 export default function Home() {
+  const supabase = useSupabaseClient();
+  const [user, setUser] = useState(null);
+
+  useEffect(() => {
+    // Fetch current session
+    const inintializeUserState = async () => {
+      const {
+        data: { user },
+      } = await supabase.auth.getUser();
+      setUser(user);
+    };
+
+    inintializeUserState();
+
+    // Listen to auth changes
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    setUser(null);
+  };
+
   return (
     <>
       <NextSeo
         title="Perfect Product Listings — AI Optimized for Etsy & Shopify"
         description="Generate perfect AI-powered product listings in seconds: optimized titles, descriptions, tags, and social captions for Etsy and Shopify sellers."
-        canonical={process.env.NEXT_PUBLIC_BASE_URL_N || 'http://localhost:3000'}
+        canonical={process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}
         openGraph={{
-          url: process.env.NEXT_PUBLIC_BASE_URL_N || 'http://localhost:3000',
+          url: process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000',
           title: 'Perfect Product Listings — AI Optimized for Etsy & Shopify',
           description:
             'Generate perfect AI-powered product listings in seconds: optimized titles, descriptions, tags, and social captions for Etsy and Shopify sellers.',
           images: [
             {
-              url: `${process.env.NEXT_PUBLIC_BASE_URL_N || 'http://localhost:3000'}/perflis.jpg`,
+              url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/perflis.jpg`,
               width: 1200,
               height: 630,
               alt: 'PerfectListing Preview',
@@ -43,9 +74,27 @@ export default function Home() {
             AI that writes optimized titles, descriptions, tags, and social captions for Etsy and
             Shopify sellers.
           </p>
-          <div className="flex gap-4">
-            <Link href="/dashboard">Try Free</Link>
-          </div>
+          {user ? (
+            <div className="flex gap-4 items-center">
+              <span>Logged in as {user.email}</span>
+              <button onClick={handleLogout} className="text-white bg-red-500 px-4 py-2 rounded">
+                Logout
+              </button>
+              <Link href="/dashboard" className="text-white bg-blue-500 px-4 py-2 rounded">
+                Dashboard
+              </Link>
+            </div>
+          ) : (
+            <div className="flex gap-4">
+              <Link href="/auth" className="text-white bg-blue-500 px-4 py-2 rounded">
+                Try Free
+              </Link>
+              <Link href="/auth/login" className="text-gray-700 bg-gray-200 px-4 py-2 rounded">
+                Login
+              </Link>
+            </div>
+          )}
+
           <div className="mt-8">
             <h2 className="text-xl font-semibold mb-2">Before / After</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
