@@ -28,7 +28,7 @@ export default function Login() {
   return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="p-6 bg-white rounded shadow">
-        <h2 className="text-xl font-semibold mb-4">Sign in / Sign up</h2>
+        <h2 className="text-xl font-semibold mb-4">Sign in</h2>
         <form onSubmit={handleMagicLink} className="space-y-2">
           <div className=" flex flex-col gap-2">
             <input

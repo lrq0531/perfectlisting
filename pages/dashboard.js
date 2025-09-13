@@ -1,67 +1,45 @@
 import { useEffect, useState } from 'react';
-import { useSession, useSupabaseClient } from '@supabase/auth-helpers-react';
+import { useSupabaseClient, useUser } from '@supabase/auth-helpers-react';
 import ListingForm from '../components/ListingForm';
 import OutputCard from '../components/OutputCard';
 
-export default function Dashboard({ success }) {
-  const session = useSession();
+export default function Dashboard() {
   const supabase = useSupabaseClient();
+  const user = useUser();
   const [result, setResult] = useState(null);
   const [loading, setLoading] = useState(false);
   const [history, setHistory] = useState([]);
-  const [user, setUser] = useState(null);
-
-  useEffect(async () => {
-    if (success == 1) {
-      alert('Payment successful! You are now a Pro user.');
-      setLoading(true);
-      const res = await fetch('/api/stripeWebhook', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-      });
-      const data = await res.json();
-      setResult(data);
-      setLoading(false);
-    }
-  }, [success]);
+  const [userProfile, setUserProfile] = useState(null);
 
   useEffect(() => {
     const fetchUser = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
       if (user) {
         // Fetch from users table
-        const { data, error } = await supabase
+        const { data = { is_paid: false } } = await supabase
           .from('profiles')
           .select('*')
           .eq('id', user.id)
           .single();
 
-        console.error('User profile is ', data, error);
-        if (!error) {
-          setUser({ ...user, ...data });
-        } else {
-          setUser({ ...user, is_paid: false }); // default to false if error
-        }
+        setUserProfile({ ...user, ...data });
       }
       setLoading(false);
     };
     fetchUser();
-  }, []);
+  }, [user]);
 
   useEffect(() => {
-    if (!session) return;
-    fetch('/api/history')
-      .then((r) => r.json())
-      .then((d) => {
-        if (d.error) {
-          console.error('Error fetching history:', d.error);
-          return;
-        }
-        setHistory(d || []);
-      });
-  }, [session]);
+    user &&
+      fetch('/api/history')
+        .then((r) => r.json())
+        .then((d) => {
+          if (d.error) {
+            console.error('Error fetching history:', d.error);
+            return;
+          }
+          setHistory(d || []);
+        });
+  }, [user]);
 
   async function handleGenerate(payload) {
     setLoading(true);
@@ -75,12 +53,12 @@ export default function Dashboard({ success }) {
     setLoading(false);
   }
 
-  if (!session) {
+  if (!user) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <div className="p-6 bg-white rounded shadow">
           <h2 className="text-xl font-semibold mb-4">Please sign in to continue</h2>
-          <a href="/auth" className="px-4 py-2 bg-blue-600 text-white rounded">
+          <a href="/login" className="px-4 py-2 bg-blue-600 text-white rounded">
             Sign in / Sign up
           </a>
         </div>
@@ -94,13 +72,13 @@ export default function Dashboard({ success }) {
     <div className="min-h-screen p-6">
       <div className="max-w-4xl mx-auto">
         <h1 className="text-2xl font-bold mb-4">AI Listing Optimizer — Dashboard</h1>
-        {!user?.is_paid && (
+        {!userProfile?.is_paid && (
           <div className="mt-4 p-4 bg-yellow-100 text-yellow-800 rounded">
             🚀 Upgrade to Pro to unlock full features!
           </div>
         )}
 
-        {user?.is_paid && (
+        {userProfile?.is_paid && (
           <div className="mt-4 p-4 bg-green-100 text-green-800 rounded">
             ✅ You are a Pro user. Thanks for supporting PerfectListing!
           </div>

@@ -5,13 +5,15 @@ export default function SignUp() {
   const supabase = useSupabaseClient();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState(undefined);
+  const [conpassword, setConPassword] = useState(undefined);
 
-  async function handleMagicLink(e) {
+  async function handleSignUp(e) {
     e.preventDefault();
-    const {
-      // data: { user },
-      error,
-    } = await supabase.auth.signUp({
+    if (password !== conpassword) {
+      alert('Passwords do not match');
+      return;
+    }
+    const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
@@ -28,8 +30,8 @@ export default function SignUp() {
   return (
     <div className="min-h-screen flex items-center justify-center">
       <div className="p-6 bg-white rounded shadow">
-        <h2 className="text-xl font-semibold mb-4">Sign in / Sign up</h2>
-        <form onSubmit={handleMagicLink} className="space-y-2">
+        <h2 className="text-xl font-semibold mb-4">Sign up</h2>
+        <form onSubmit={handleSignUp} className="space-y-2">
           <div className=" flex flex-col gap-2">
             <input
               value={email}
@@ -41,6 +43,13 @@ export default function SignUp() {
               value={password}
               onChange={(e) => setPassword(e.target.value)}
               placeholder="password"
+              className="w-64 border rounded px-2 py-1"
+              type="password"
+            />
+            <input
+              value={conpassword}
+              onChange={(e) => setConPassword(e.target.value)}
+              placeholder="Confirm password"
               className="w-64 border rounded px-2 py-1"
               type="password"
             />
