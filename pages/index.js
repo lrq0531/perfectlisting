@@ -1,36 +1,13 @@
 import Link from 'next/link';
 import { NextSeo } from 'next-seo';
-import { useState, useEffect } from 'react';
-import { useSupabaseClient } from '@supabase/auth-helpers-react';
+import { useSupabaseClient, useUser } from '@supabase/auth-helpers-react';
 
 export default function Home() {
-  const supabase = useSupabaseClient();
-  const [user, setUser] = useState(null);
-
-  useEffect(() => {
-    // Fetch current session
-    const inintializeUserState = async () => {
-      const {
-        data: { user },
-      } = await supabase.auth.getUser();
-      setUser(user);
-    };
-
-    inintializeUserState();
-
-    // Listen to auth changes
-    const {
-      data: { subscription },
-    } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-    });
-
-    return () => subscription.unsubscribe();
-  }, []);
+  const supabaseAnon = useSupabaseClient();
+  const user = useUser();
 
   const handleLogout = async () => {
-    await supabase.auth.signOut();
-    setUser(null);
+    await supabaseAnon.auth.signOut();
   };
 
   return (
