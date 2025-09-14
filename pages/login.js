@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { useSupabaseClient } from '@supabase/auth-helpers-react';
 
@@ -45,8 +46,11 @@ export default function Login() {
               type="password"
             />
           </div>
-          <div>
+          <div className="flex justify-between items-center gap-2">
             <button className="px-4 py-2 bg-blue-600 text-white rounded">Login</button>
+            <Link className="text-blue-600" href="/forgot-password">
+              Forgot Password?
+            </Link>
           </div>
         </form>
       </div>
