@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { NextSeo } from 'next-seo';
 import { useSupabaseClient, useUser } from '@supabase/auth-helpers-react';
 import ListingForm from '../components/ListingForm';
 import OutputCard from '../components/OutputCard';
